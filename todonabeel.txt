@@ -1,4 +1,9 @@
-perfect sidebar first 
-then other main ui like navbar and all then well dive into my doctor module ok
-if i have time i have to work on c3
-but before that within 28 complete backend project, and docker,aws
+till now i have modified dashboards like that more i will do later
+
+ok so right now the complete workflow of this project you have to understnad ok then you have to paste it in the chatgpt and understand the entire workflow only 
+
+
+ok then to claude you have to say that i have built this ui i guess i dont know which tech stack to use and its not a real world project so for now my aim is to make it working in the frontend only like i have to make the entire  working in the frontend itself like the core functionality the login and backend stuff like auth , encryption and all we can do later right 
+
+
+then later if i am comfortable i can change the functionality to work in backend and database ok

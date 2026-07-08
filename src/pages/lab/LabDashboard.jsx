@@ -3,6 +3,8 @@ import { useAuth } from '../../context/AuthContext'
 import Sidebar from '../../components/common/Sidebar'
 import StatsCard from '../../components/common/StatsCard'
 import StatusBadge from '../../components/common/StatusBadge'
+import { useQueue } from '../../store/hospitalStore'
+// inside the component:
 
 const NAV_LINKS = [
   "Lab Dashboard",
@@ -85,6 +87,8 @@ function PriorityBadge({ priority }) {
   )
 }
 
+
+
 function LabStatusBadge({ status }) {
   return (
     <span className={`px-2 py-1 rounded-full text-xs font-medium ${STATUS_STYLES[status] || "bg-gray-100 text-gray-600"}`}>
@@ -97,7 +101,6 @@ function LabDashboard() {
   const { user } = useAuth()
   const [activeLink, setActiveLink] = useState("Lab Dashboard")
   const [search, setSearch] = useState('')
-
   const filtered = PENDING_ORDERS.filter(o =>
     o.patient.toLowerCase().includes(search.toLowerCase()) ||
     o.orderId.toLowerCase().includes(search.toLowerCase()) ||

@@ -4,6 +4,7 @@ import Sidebar from '../../components/common/Sidebar'
 import StatsCard from '../../components/common/StatsCard'
 import StatusBadge from '../../components/common/StatusBadge'
 import { useNavigate } from 'react-router-dom'
+import { useQueue, useAllVitals } from '../../store/hospitalStore'
 
 const NAV_LINKS = [
   "Dashboard",
@@ -15,61 +16,28 @@ const NAV_LINKS = [
   "Follow-up Manager",
 ]
 
-const PATIENT_QUEUE = [
-  {
-    token: "T-007",
-    name: "Rajan",
-    age: "28F",
-    vitals: "Done",
-    priority: "Normal",
-    complaint: "Persistent cough, 3 days",
-    status: "Waiting",
-  },
-  {
-    token: "T-009",
-    name: "Sneha Patel",
-    age: "31F",
-    vitals: "Done",
-    priority: "Normal",
-    complaint: "Chest pain, palpitations",
-    status: "Ready",
-  },
-  {
-    token: "T-010",
-    name: "Rajesh Verma",
-    age: "56M",
-    vitals: "Pending",
-    priority: "Urgent",
-    complaint: "Hypertension follow-up",
-    status: "Waiting",
-  },
-  {
-    token: "T-012",
-    name: "Rao",
-    age: "67M",
-    vitals: "Done",
-    priority: "Normal",
-    complaint: "Knee pain, post-op review",
-    status: "Waiting",
-  },
-]
+// Statuses a doctor actually needs to see today
+const DOCTOR_RELEVANT_STATUSES = ["Waiting", "Ready for Doctor", "With Doctor"]
 
 function DoctorDashboard() {
   const { user } = useAuth()
+  const navigate  = useNavigate()
   const [activeLink, setActiveLink] = useState("Dashboard")
-const navigate = useNavigate()
+
+  // ── Shared store ──
+  const { queue } = useQueue()
+  const vitalsMap = useAllVitals()
+
+  const doctorQueue = queue.filter(v => DOCTOR_RELEVANT_STATUSES.includes(v.status))
+  const doneToday    = queue.filter(v => v.status === "Done").length
+  const pendingCount = doctorQueue.length
+  const criticalCount = queue.filter(v => v.priority === "Critical").length
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
 
-      {/* Sidebar */}
-      <Sidebar
-        links={NAV_LINKS}
-        activeLink={activeLink}
-        onLinkClick={setActiveLink}
-      />
+      <Sidebar links={NAV_LINKS} activeLink={activeLink} onLinkClick={setActiveLink} />
 
-      {/* Main Content */}
       <main className="flex-1 p-6 overflow-auto">
 
         {/* Header */}
@@ -85,16 +53,16 @@ const navigate = useNavigate()
           </button>
         </div>
 
-        {/* Stats Row */}
+        {/* Stats Row — derived from the store */}
         <div className="grid grid-cols-5 gap-4 mb-6">
-          <StatsCard icon="👤" label="Today's Patients"   value={12} />
-          <StatsCard icon="✅" label="Consultations Done" value={6}  />
-          <StatsCard icon="⏳" label="Pending"            value={4}  />
+          <StatsCard icon="👤" label="Today's Patients"   value={queue.length} />
+          <StatsCard icon="✅" label="Consultations Done" value={doneToday}  />
+          <StatsCard icon="⏳" label="Pending"            value={pendingCount}  />
           <StatsCard icon="📅" label="Follow-ups Due"     value={3}  />
-          <StatsCard icon="⚠️" label="Critical Cases"     value={3}  />
+          <StatsCard icon="⚠️" label="Critical Cases"     value={criticalCount}  />
         </div>
 
-        {/* Patient Queue Table */}
+        {/* Patient Queue Table — now from the shared store */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
           <h3 className="font-semibold text-gray-700 mb-4">
             Today's Patient Queue
@@ -115,28 +83,36 @@ const navigate = useNavigate()
                 </tr>
               </thead>
               <tbody>
-                {PATIENT_QUEUE.map(p => (
-                  <tr
-                    key={p.token}
-                    className="border-b border-gray-50 hover:bg-gray-50 transition"
-                  >
-                    <td className="py-3 font-mono text-xs text-gray-500">{p.token}</td>
-                    <td className="py-3 font-medium text-blue-600 cursor-pointer hover:underline">{p.name}</td>
-                    <td className="py-3 text-gray-500">{p.age}</td>
-                    <td className="py-3"><StatusBadge status={p.vitals} /></td>
-                    <td className="py-3"><StatusBadge status={p.priority} /></td>
-                    <td className="py-3 text-gray-600 max-w-48">{p.complaint}</td>
-                    <td className="py-3"><StatusBadge status={p.status} /></td>
+                {doctorQueue.map(v => (
+                  <tr key={v.token} className="border-b border-gray-50 hover:bg-gray-50 transition">
+                    <td className="py-3 font-mono text-xs text-gray-500">{v.token}</td>
+                    <td className="py-3 font-medium text-blue-600 cursor-pointer hover:underline">
+                      {v.patient?.name}
+                    </td>
+                    <td className="py-3 text-gray-500">
+                      {v.patient?.age}{v.patient?.gender?.charAt(0)}
+                    </td>
+                    <td className="py-3"><StatusBadge status={vitalsMap[v.token] ? "Done" : "Pending"} /></td>
+                    <td className="py-3"><StatusBadge status={v.priority} /></td>
+                    <td className="py-3 text-gray-600 max-w-48">{v.complaint}</td>
+                    <td className="py-3"><StatusBadge status={v.status} /></td>
                     <td className="py-3">
-                    <button
-                    onClick={() => navigate(`/doctor/consultation/${p.token}`)}
-                    className="bg-gray-800 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-gray-700 transition"
-                    >
-                    Open Case
-                    </button>
+                      <button
+                        onClick={() => navigate(`/doctor/consultation/${v.token}`)}
+                        className="bg-gray-800 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-gray-700 transition"
+                      >
+                        Open Case
+                      </button>
                     </td>
                   </tr>
                 ))}
+                {doctorQueue.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="py-8 text-center text-gray-400 text-sm">
+                      No patients waiting right now
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

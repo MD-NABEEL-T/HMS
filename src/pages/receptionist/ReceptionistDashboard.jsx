@@ -4,6 +4,7 @@ import Sidebar from '../../components/common/Sidebar'
 import StatsCard from '../../components/common/StatsCard'
 import StatusBadge from '../../components/common/StatusBadge'
 import { useNavigate } from 'react-router-dom'
+import { useQueue } from '../../store/hospitalStore'
 
 const NAV_LINKS = [
   "Dashboard",
@@ -15,19 +16,15 @@ const NAV_LINKS = [
   "Follow-up Management",
 ]
 
+// NOTE: Appointments are still local mock data for this step — only the
+// Live Queue panel is wired to the shared store so far. Appointments will
+// move to the store in a later step.
 const APPOINTMENTS = [
   { patient: "Arjun Mehta",     pid: "P-1042", doctor: "Dr. Priya Sharma", time: "09:00 AM", type: "Consultation", status: "Completed"   },
   { patient: "Kavitha Rajan",   pid: "P-1043", doctor: "Dr. Ravi Kumar",   time: "09:30 AM", type: "Follow-up",    status: "In Progress" },
   { patient: "Mohammed Farhan", pid: "P-1044", doctor: "Dr. Priya Sharma", time: "10:00 AM", type: "New Patient",  status: "Waiting"     },
   { patient: "Sneha Patel",     pid: "P-1045", doctor: "Dr. Arun Nair",    time: "10:30 AM", type: "Consultation", status: "Scheduled"   },
   { patient: "Rajesh Verma",    pid: "P-1046", doctor: "Dr. Ravi Kumar",   time: "11:00 AM", type: "Review",       status: "Scheduled"   },
-]
-
-const LIVE_QUEUE = [
-  { token: "T-008", name: "Mohammed Farhan", dept: "General",    wait: null,     serving: true  },
-  { token: "T-009", name: "Sneha Patel",     dept: "Cardiology", wait: "14 min", serving: false },
-  { token: "T-010", name: "Rajesh Verma",    dept: "Ortho",      wait: "28 min", serving: false },
-  { token: "T-011", name: "Anita Desai",     dept: "General",    wait: "35 min", serving: false },
 ]
 
 const TYPE_STYLES = {
@@ -51,6 +48,10 @@ function ReceptionistDashboard() {
   const [activeLink, setActiveLink] = useState("Dashboard")
   const [search, setSearch] = useState('')
 
+  // ── Shared store — Live Queue panel ──
+  const { queue } = useQueue()
+  const liveQueue = queue.filter(v => v.status !== "Done").slice(0, 5)
+
   const handleNavClick = (link) => {
     setActiveLink(link)
     if (link === "Patient Management")     navigate('/receptionist/patients')
@@ -70,11 +71,7 @@ function ReceptionistDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
 
-      <Sidebar
-        links={NAV_LINKS}
-        activeLink={activeLink}
-        onLinkClick={handleNavClick}
-      />
+      <Sidebar links={NAV_LINKS} activeLink={activeLink} onLinkClick={handleNavClick} />
 
       <main className="flex-1 p-6 overflow-auto">
 
@@ -93,9 +90,9 @@ function ReceptionistDashboard() {
 
         {/* Stats */}
         <div className="grid grid-cols-4 gap-4 mb-6">
-          <StatsCard icon="👥" label="Today's Patients"  value={47}        sub="+12% vs yesterday" subColor="text-green-500" trend="up" />
+          <StatsCard icon="👥" label="Today's Patients"  value={queue.length}  sub="+12% vs yesterday" subColor="text-green-500" trend="up" />
           <StatsCard icon="📅" label="Appointments"      value={23}        sub="6 pending"         subColor="text-orange-400" />
-          <StatsCard icon="🔢" label="In Queue"          value={8}         sub="Avg wait 14 min"   subColor="text-gray-400" />
+          <StatsCard icon="🔢" label="In Queue"          value={liveQueue.length}         sub="Avg wait 14 min"   subColor="text-gray-400" />
           <StatsCard icon="💲" label="Billing Pending"   value="₹18,400"   sub="5 unpaid invoices" subColor="text-red-400" />
         </div>
 
@@ -129,7 +126,7 @@ function ReceptionistDashboard() {
         {/* Bottom: Appointments + Live Queue */}
         <div className="flex gap-4">
 
-          {/* Today's Appointments */}
+          {/* Today's Appointments — unchanged for this step */}
           <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-gray-700">Today's Appointments</h3>
@@ -174,7 +171,7 @@ function ReceptionistDashboard() {
             </table>
           </div>
 
-          {/* Live Queue */}
+          {/* Live Queue — now from the shared store */}
           <div className="w-72 bg-white rounded-xl shadow-sm border border-gray-100 p-5 shrink-0">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-gray-700">Live Queue</h3>
@@ -185,22 +182,28 @@ function ReceptionistDashboard() {
             </div>
 
             <div className="flex flex-col gap-3">
-              {LIVE_QUEUE.map(q => (
-                <div
-                  key={q.token}
-                  className={`flex items-center gap-3 p-3 rounded-lg ${q.serving ? 'bg-blue-50 border border-blue-100' : 'hover:bg-gray-50'}`}
-                >
-                  <span className="text-xs font-bold text-gray-500 w-10 shrink-0">{q.token}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-800 text-sm truncate">{q.name}</p>
-                    <p className="text-xs text-gray-400">{q.dept}</p>
+              {liveQueue.map(v => {
+                const serving = v.status === "With Doctor"
+                return (
+                  <div
+                    key={v.token}
+                    className={`flex items-center gap-3 p-3 rounded-lg ${serving ? 'bg-blue-50 border border-blue-100' : 'hover:bg-gray-50'}`}
+                  >
+                    <span className="text-xs font-bold text-gray-500 w-10 shrink-0">{v.token}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-800 text-sm truncate">{v.patient?.name}</p>
+                      <p className="text-xs text-gray-400">{v.department}</p>
+                    </div>
+                    {serving
+                      ? <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full font-medium shrink-0">Serving</span>
+                      : <span className="text-xs text-gray-400 shrink-0">{v.status}</span>
+                    }
                   </div>
-                  {q.serving
-                    ? <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full font-medium shrink-0">Serving</span>
-                    : <span className="text-xs text-gray-400 shrink-0">{q.wait}</span>
-                  }
-                </div>
-              ))}
+                )
+              })}
+              {liveQueue.length === 0 && (
+                <p className="text-sm text-gray-400 text-center py-4">No one in queue</p>
+              )}
             </div>
           </div>
 

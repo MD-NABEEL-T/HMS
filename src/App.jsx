@@ -184,7 +184,7 @@ function App() {
             <TestOrder />
           </ProtectedRoute>
         }/>
-<<<<<<< HEAD
+
         <Route path="/lab/sample-collection" element={
           <ProtectedRoute allowedRole="lab">
             <SampleCollection />
@@ -200,7 +200,6 @@ function App() {
             <ReportsManagement />
           </ProtectedRoute>
         }/>
-=======
 <Route path="/admin" element={
   <ProtectedRoute allowedRole="admin">
     <AdminDashboard />
@@ -247,7 +246,7 @@ function App() {
   </ProtectedRoute>
 } />
 
->>>>>>> 3751ef7167aa4641eb4c21b8955c4075573944df
+ 3751ef7167aa4641eb4c21b8955c4075573944df
 
       </Routes>
     </BrowserRouter>
