@@ -5,7 +5,21 @@ import { createContext, useContext, useReducer, useEffect } from 'react'
 // keyed consistently by patientId. `token` is the CURRENT visit token for
 // that patient today (tokens are per-visit, patientId is permanent).
 // ─────────────────────────────────────────────────────────────────────────
+// Doctors — referenced by name elsewhere (prescriptions, lab orders, diagnoses)
+// This is the first place they exist as real records instead of plain strings.
+const SEED_DOCTORS = [
+  { id: "D-001", name: "Dr. Priya Sharma", specialty: "Cardiology", qualification: "MD, DM Cardiology", status: "Active", experience: "18 years", schedule: "Mon–Sat, 9am–1pm" },
+  { id: "D-002", name: "Dr. Ravi Kumar", specialty: "General Medicine", qualification: "MD Internal Medicine", status: "Active", experience: "12 years", schedule: "Mon–Fri, 10am–2pm" },
+  { id: "D-003", name: "Dr. Arun Nair", specialty: "Orthopedics", qualification: "MS Ortho, DNB", status: "Active", experience: "15 years", schedule: "Tue–Sat, 11am–3pm" },
+]
 
+// Staff — nurses, lab techs, pharmacists, receptionists, admin
+const SEED_STAFF = [
+  { id: "S-101", name: "Sr. Meena", role: "Head Nurse", dept: "General Ward", phone: "+91 90001 21001", status: "Active" },
+  { id: "S-102", name: "Sr. Rani", role: "Staff Nurse", dept: "General Ward", phone: "+91 90001 21002", status: "Active" },
+  { id: "S-103", name: "Karthik R", role: "Lab Technician", dept: "Laboratory", phone: "+91 90001 21003", status: "Active" },
+  { id: "S-104", name: "Divya S", role: "Pharmacist", dept: "Pharmacy", phone: "+91 90001 21004", status: "Active" },
+]
 const SEED_PATIENTS = [
   {
     id: "P-1001", name: "Arjun Mehta", age: 34, gender: "Male", blood: "O+",
@@ -189,6 +203,8 @@ const initialState = {
   prescriptions: SEED_PRESCRIPTIONS,
   appointments: SEED_APPOINTMENTS,        // ADD THIS
   labOrders: SEED_LAB_ORDERS,
+  doctors: SEED_DOCTORS,             // ADD THIS
+  staff: SEED_STAFF,
   labResults: SEED_LAB_RESULTS,           // NEW
   radiologyOrders: SEED_RADIOLOGY_ORDERS, // NEW
   followUps: SEED_FOLLOWUPS,              // NEW
@@ -354,7 +370,21 @@ function hospitalReducer(state, action) {
     case 'ADD_BILL': {
       return { ...state, bills: [action.payload, ...state.bills] }
     }
+    case 'ADD_DOCTOR': {
+      return { ...state, doctors: [action.payload, ...state.doctors] }
+    }
 
+    case 'ADD_STAFF': {
+      return { ...state, staff: [action.payload, ...state.staff] }
+    }
+
+    case 'UPDATE_STAFF_STATUS': {
+      const { id, status } = action.payload
+      return {
+        ...state,
+        staff: state.staff.map(s => s.id === id ? { ...s, status } : s),
+      }
+    }
     default:
       return state
   }
@@ -402,33 +432,7 @@ function useHospital() {
   return ctx
 }
 
-// In hospitalStore.jsx
 
-const STORAGE_KEY = 'hms_hospital_state'
-
-function loadState() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) return JSON.parse(saved)
-  } catch (e) {
-    console.error('Failed to load saved state, using seed data', e)
-  }
-  return initialState // falls back to your existing SEED_* data
-}
-
-export function HospitalProvider({ children }) {
-  const [state, dispatch] = useReducer(hospitalReducer, undefined, loadState)
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-  }, [state])
-
-  return (
-    <HospitalContext.Provider value={{ state, dispatch }}>
-      {children}
-    </HospitalContext.Provider>
-  )
-}
 // ─────────────────────────────────────────────────────────────────────────
 // SELECTOR HOOKS — pages import these instead of hardcoding mock arrays
 // ─────────────────────────────────────────────────────────────────────────
@@ -553,4 +557,17 @@ export function useFollowUps() {
 export function useResetDemoData() {
   const { resetDemoData } = useHospital()
   return resetDemoData
+}
+
+export function useDoctors() {
+  const { state, dispatch } = useHospital()
+  const addDoctor = (doctor) => dispatch({ type: 'ADD_DOCTOR', payload: doctor })
+  return { doctors: state.doctors, addDoctor }
+}
+
+export function useStaff() {
+  const { state, dispatch } = useHospital()
+  const addStaff = (member) => dispatch({ type: 'ADD_STAFF', payload: member })
+  const updateStatus = (id, status) => dispatch({ type: 'UPDATE_STAFF_STATUS', payload: { id, status } })
+  return { staff: state.staff, addStaff, updateStatus }
 }

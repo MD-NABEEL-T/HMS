@@ -242,7 +242,11 @@ function App() {
             <ReportsManagement />
           </ProtectedRoute>
         } />
-
+        <Route path="/lab/result-entry/:orderId" element={
+          <ProtectedRoute allowedRole="lab">
+            <ResultEntry />
+          </ProtectedRoute>
+        } />
 
 
 

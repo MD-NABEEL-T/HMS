@@ -43,9 +43,7 @@ function SampleCollection() {
   const { labOrders, updateStatus } = useLabOrders()
   const patients = usePatients()
 
-  const order = orderId
-    ? labOrders.find(o => o.orderId === orderId)
-    : labOrders.find(o => o.status === "Pending") || labOrders[0]
+const order = orderId ? labOrders.find(o => o.orderId === orderId) : null
 
   const [barcodes, setBarcodes] = useState({})
   const [collected, setCollected] = useState({})
@@ -63,17 +61,68 @@ function SampleCollection() {
     if (link === "Sample Collection")   navigate('/lab/sample-collection')
   }
 
-  if (!order) {
+ if (!orderId) {
+    const pending = labOrders.filter(o => o.status === "Pending")
     return (
       <div className="min-h-screen bg-gray-50 flex">
         <Sidebar links={NAV_LINKS} activeLink={activeLink} onLinkClick={handleNavClick} />
-        <main className="flex-1 p-6">
-          <p className="text-gray-500">No lab orders waiting for sample collection.</p>
+        <main className="flex-1 p-6 overflow-auto">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-800">Sample Collection</h2>
+            <p className="text-sm text-gray-400">Select an order to collect samples for</p>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-gray-400 border-b border-gray-100">
+                  <th className="pb-3 font-medium">Order ID</th>
+                  <th className="pb-3 font-medium">Patient</th>
+                  <th className="pb-3 font-medium">Tests</th>
+                  <th className="pb-3 font-medium">Priority</th>
+                  <th className="pb-3 font-medium"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {pending.map(o => {
+                  const pat = patients.find(p => p.id === o.patientId)
+                  return (
+                    <tr key={o.orderId} className="border-b border-gray-50 hover:bg-gray-50 transition">
+                      <td className="py-3 font-mono text-xs text-gray-500">{o.orderId}</td>
+                      <td className="py-3 font-medium text-gray-800">{pat?.name || o.patientId}</td>
+                      <td className="py-3 text-gray-500">{o.tests.map(t => t.name).join(', ')}</td>
+                      <td className="py-3 text-gray-500">{o.priority}</td>
+                      <td className="py-3 text-right">
+                        <button
+                          onClick={() => navigate(`/lab/sample-collection/${o.orderId}`)}
+                          className="bg-gray-800 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-gray-700 transition"
+                        >
+                          Collect
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
+                {pending.length === 0 && (
+                  <tr><td colSpan={5} className="py-8 text-center text-gray-400 text-sm">No orders waiting for sample collection</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </main>
       </div>
     )
   }
 
+  if (!order) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex">
+        <Sidebar links={NAV_LINKS} activeLink={activeLink} onLinkClick={handleNavClick} />
+        <main className="flex-1 p-6">
+          <p className="text-gray-500">No order found for that ID.</p>
+        </main>
+      </div>
+    )
+  }
   const patient = patients.find(p => p.id === order.patientId)
   const samples = buildSamples(order.tests)
 

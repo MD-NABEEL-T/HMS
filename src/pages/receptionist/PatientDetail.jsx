@@ -3,15 +3,10 @@ import Sidebar from '../../components/common/Sidebar'
 import { useState } from 'react'
 import { usePatient, useVisit, useQueue } from '../../store/hospitalStore'
 
-const NAV_LINKS = [
-  "Dashboard",
-  "Patient Management",
-  "Patient Registration",
-  "Appointment Management",
-  "Queue Management",
-  "Billing Collection",
-  "Follow-up Management",
-]
+// This page is a single patient's detail view — only Dashboard and Patient
+// Management make sense as "back out" links here; the rest belong to the
+// receptionist's main workspace, not a patient-specific screen.
+const NAV_LINKS = ["Dashboard", "Patient Management"]
 
 function PatientDetail() {
   const { id }     = useParams()

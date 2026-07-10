@@ -63,10 +63,7 @@ function ResultEntry() {
 
   // Prefer a specific order from the URL; otherwise grab the first order
   // that's ready for results (sample collected but not yet completed).
-  const order = orderId
-    ? labOrders.find(o => o.orderId === orderId)
-    : labOrders.find(o => o.status === "Sample Collected") || labOrders.find(o => o.status !== "Completed")
-
+const order = orderId ? labOrders.find(o => o.orderId === orderId) : null
   // values keyed by `${testName}::${paramId}` -> { value, flag }
   const [values, setValues] = useState({})
   const [saved, setSaved] = useState(false)
@@ -80,12 +77,62 @@ function ResultEntry() {
     if (link === "Result Entry")        navigate('/lab/result-entry')
   }
 
+if (!orderId) {
+    const ready = labOrders.filter(o => o.status === "Sample Collected")
+    return (
+      <div className="min-h-screen bg-gray-50 flex">
+        <Sidebar links={NAV_LINKS} activeLink={activeLink} onLinkClick={handleNavClick} />
+        <main className="flex-1 p-6 overflow-auto">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-800">Result Entry</h2>
+            <p className="text-sm text-gray-400">Select an order to enter results for</p>
+          </div>
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-gray-400 border-b border-gray-100">
+                  <th className="pb-3 font-medium">Order ID</th>
+                  <th className="pb-3 font-medium">Patient</th>
+                  <th className="pb-3 font-medium">Tests</th>
+                  <th className="pb-3 font-medium"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {ready.map(o => {
+                  const pat = patients.find(p => p.id === o.patientId)
+                  return (
+                    <tr key={o.orderId} className="border-b border-gray-50 hover:bg-gray-50 transition">
+                      <td className="py-3 font-mono text-xs text-gray-500">{o.orderId}</td>
+                      <td className="py-3 font-medium text-gray-800">{pat?.name || o.patientId}</td>
+                      <td className="py-3 text-gray-500">{o.tests.map(t => t.name).join(', ')}</td>
+                      <td className="py-3 text-right">
+                        <button
+                          onClick={() => navigate(`/lab/result-entry/${o.orderId}`)}
+                          className="bg-gray-800 text-white text-xs px-3 py-1.5 rounded-lg hover:bg-gray-700 transition"
+                        >
+                          Enter Results
+                        </button>
+                      </td>
+                    </tr>
+                  )
+                })}
+                {ready.length === 0 && (
+                  <tr><td colSpan={4} className="py-8 text-center text-gray-400 text-sm">No orders ready for result entry — samples must be collected first</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
   if (!order) {
     return (
       <div className="min-h-screen bg-gray-50 flex">
         <Sidebar links={NAV_LINKS} activeLink={activeLink} onLinkClick={handleNavClick} />
         <main className="flex-1 p-6">
-          <p className="text-gray-500">No lab orders ready for result entry.</p>
+          <p className="text-gray-500">No order found for that ID.</p>
         </main>
       </div>
     )

@@ -6,15 +6,10 @@ import StatusBadge from '../../components/common/StatusBadge'
 import { useNavigate } from 'react-router-dom'
 import { useQueue, useAllVitals } from '../../store/hospitalStore'
 
-const NAV_LINKS = [
-  "Dashboard",
-  "Patient Consultation",
-  "Diagnosis",
-  "Prescription",
-  "Lab Order",
-  "Radiology Order",
-  "Follow-up Manager",
-]
+// Dashboard has no specific patient selected yet — the other links need a
+// token in the URL to work, so we don't show them here. They appear once
+// a doctor clicks "Open Case" on a patient and lands on a token-based page.
+const NAV_LINKS = ["Dashboard"]
 
 // Statuses a doctor actually needs to see today
 const DOCTOR_RELEVANT_STATUSES = ["Waiting", "Ready for Doctor", "With Doctor"]
