@@ -1,14 +1,16 @@
-// App.jsx
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import Login from './pages/auth/Login'
-import ProtectedRoute from './routes/ProtectedRoute'
-import VitalsHistory from './pages/nurse/VitalsHistory'
-import PharmacyDashboard from './pages/pharmacy/PharmacyDashboard'
-import DispenseMedicine from './pages/pharmacy/DispenseMedicine'
-import Billing from './pages/pharmacy/Billing'
-import MedicineInventory from './pages/pharmacy/MedicineInventory'
-import AddMedicine from './pages/pharmacy/AddMedicine'
-import PrescriptionQueue from './pages/pharmacy/PrescriptionQueue'
+  // App.jsx
+  import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+  import Login from './pages/auth/Login'
+  import ProtectedRoute from './routes/ProtectedRoute'
+  import VitalsHistory from './pages/nurse/VitalsHistory'
+  //receptionist
+  import PatientManagement from './pages/receptionist/PatientManagement'
+  import PatientProfile from './pages/receptionist/PatientProfile'
+  import PatientRegistration from './pages/receptionist/PatientRegistration'
+  import AppointmentManagement from './pages/receptionist/AppointmentManagement'
+  import QueueManagement from './pages/receptionist/QueueManagement'
+  import BillingCollection from './pages/receptionist/BillingCollection'
+  import FollowUpManagement from './pages/receptionist/FollowUpManagement'
 
 // Receptionist pages
 import ReceptionistDashboard from './pages/receptionist/ReceptionistDashboard'
@@ -331,9 +333,9 @@ function App() {
   }
 />
 
-      </Routes>
-    </BrowserRouter>
-  )
-}
+        </Routes>
+      </BrowserRouter>
+    )
+  }
 
-export default App
+  export default App
