@@ -9,7 +9,6 @@ Streamlining hospital operations — from patient registration to discharge — 
 [![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![React Router](https://img.shields.io/badge/React_Router-7-CA4245?logo=reactrouter&logoColor=white)](https://reactrouter.com/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 
 [**Live Demo**](#) &nbsp;•&nbsp; [Features](#-features) &nbsp;•&nbsp; [Tech Stack](#-tech-stack) &nbsp;•&nbsp; [Getting Started](#-getting-started) &nbsp;•&nbsp; [Roadmap](#-roadmap)
 
@@ -21,7 +20,7 @@ Streamlining hospital operations — from patient registration to discharge — 
 
 **MediCare HMS** is a full-featured Hospital Management System frontend built to handle the day-to-day workflow of a hospital across **7 distinct roles** — Admin, Doctor, Nurse, Receptionist, Lab Technician, Pharmacist, and IP (In-Patient) Manager. Each role gets its own dashboard, navigation, and permissions, so every user sees only what's relevant to their job — from patient check-in to lab results to prescription dispensing.
 
-> 🚧 The project currently runs on an in-memory data store with role-based mock authentication, with a real Node/Express/MongoDB backend planned next. See [Roadmap](#-roadmap).
+> 🚧 The project currently runs on an in-memory data store with role-based mock authentication. A real backend is planned next — see [Roadmap](#-roadmap).
 
 ## ✨ Features
 
@@ -53,7 +52,7 @@ Streamlining hospital operations — from patient registration to discharge — 
 
 **Planned Backend** *(see [Roadmap](#-roadmap))*
 - Node.js + Express
-- MongoDB
+- MongoDB Atlas
 - JWT-based authentication
 
 ## 📸 Screenshots
@@ -134,15 +133,16 @@ src/
 
 ## 🗺️ Roadmap
 
-- [ ] Node/Express/MongoDB backend with real data persistence
-- [ ] JWT-based authentication (replacing mock login)
+- [ ] Backend built with **Node.js + Express**
+- [ ] Database migration to **MongoDB Atlas**
+- [ ] **JWT-based authentication** (replacing mock login)
 - [ ] Real-time notifications (appointments, lab results, bed availability)
 - [ ] Role-based access control enforced server-side
 - [ ] Deployment of full-stack app (frontend + backend + database)
 
 ## 🤝 Contributing
 
-This project was built collaboratively, with each module owned by a different contributor. Contributions, issues, and feature requests are welcome — feel free to check the [issues page](https://github.com/MD-NABEEL-T/HMS/issues).
+This project was built collaboratively, with each teammate owning a separate module. Contributions, issues, and feature requests are welcome — feel free to check the [issues page](https://github.com/MD-NABEEL-T/HMS/issues).
 
 1. Fork the project
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -150,22 +150,22 @@ This project was built collaboratively, with each module owned by a different co
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📄 License
+## 👥 Team
 
-Distributed under the MIT License. See `LICENSE` for more information.
+This project was built by an 8-member team, each owning a dedicated module:
 
-## 👤 Authors
+| Name | GitHub |
+|---|---|
+| **Mohammed Nabeel T** (Lead) | [@MD-NABEEL-T](https://github.com/MD-NABEEL-T) |
+| **Mohammed Abuzar J** | — | 
+| **Mohammed Aasif** | — |
+| **Mohammed Ayaz** | — |
+| **Anbarasan** | — |
+| **Mohammed Kashif** | — |
+| **Faazil Ammar P** | — |
+| **Ashfaq Ahmed M** | — |
 
-**Mohammed Nabeel T**
-**Mohammed Abuzar J**
-**Mohammed Aasif**
-**Mohammed Ayaz**
-**Anbarasan**
-**Mohammed Kashif **
-**Faazil Ammar P**
-**Ashfaq Ahmed M**
-
-- GitHub: [@MD-NABEEL-T](https://github.com/MD-NABEEL-T)
+> Add each teammate's GitHub handle in place of `—` so their profile links directly from the README.
 
 ---
 
