@@ -154,11 +154,18 @@ This project was built collaboratively, with each module owned by a different co
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
-## 👤 Author
+## 👤 Authors
 
 **Mohammed Nabeel T**
+**Mohammed Abuzar J**
+**Mohammed Aasif**
+**Mohammed Ayaz**
+**Anbarasan**
+**Mohammed Kashif **
+**Faazil Ammar P**
+**Ashfaq Ahmed M**
 
-- GitHub: [@mdnabeelt](https://github.com/mdnabeelt) / [@MD-NABEEL-T](https://github.com/MD-NABEEL-T)
+- GitHub: [@MD-NABEEL-T](https://github.com/MD-NABEEL-T)
 
 ---
 
